@@ -36,23 +36,30 @@ def load_llm(huggingface_repo_id, HF_TOKEN):
 
 def format_text_for_display(text):
     """Format text to display properly in Streamlit with line breaks."""
-    text = text.replace('\n', '\n\n')
-    
+    text = re.sub(r'\s+', ' ', text)
+
     numbered_pattern = r'(\d+\.\s)'
     if re.search(numbered_pattern, text):
-        parts = []
-        for line in text.split('\n\n'):
-            if re.match(numbered_pattern, line.strip()):
-                parts.append(line)
+        parts = re.split(r'(\d+\.\s)', text)
+        if parts[0].strip() == '':
+            parts = parts[1:]  
+        
+        formatted_text = ''
+        for i in range(0, len(parts), 2):
+            if i+1 < len(parts):
+                point_num = parts[i]
+                content = parts[i+1].strip()
+                formatted_text += f"{point_num}{content}\n\n"
             else:
-                parts.append(line)
-        text = '\n\n'.join(parts)
-    
-    return text
+                formatted_text += parts[i]
+        
+        return formatted_text.strip()
+
+    paragraphs = [p.strip() for p in text.split('.') if p.strip()]
+    return '. '.join(paragraphs) + '.'
 
 
 def is_greeting(text):
-    """Check if the input is a greeting."""
     greetings = [
         'hello', 'hi', 'hey', 'greetings', 'good morning', 'good afternoon', 
         'good evening', 'howdy', 'what\'s up', 'whats up', 'hiya'
@@ -75,7 +82,6 @@ def is_greeting(text):
 
 
 def get_greeting_response():
-    """Return a friendly greeting response."""
     import random
     responses = [
         "Hello! I'm DocBot, your medical assistant. How can I help you today?",
