@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+import re
 
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
@@ -33,8 +34,71 @@ def load_llm(huggingface_repo_id, HF_TOKEN):
     return llm
 
 
+def format_text_for_display(text):
+    """Format text to display properly in Streamlit with line breaks."""
+    # Replace single newlines with double newlines for better spacing
+    text = text.replace('\n', '\n\n')
+    
+    # Format numbered lists properly
+    numbered_pattern = r'(\d+\.\s)'
+    if re.search(numbered_pattern, text):
+        parts = []
+        for line in text.split('\n\n'):
+            if re.match(numbered_pattern, line.strip()):
+                parts.append(line)
+            else:
+                parts.append(line)
+        text = '\n\n'.join(parts)
+    
+    return text
+
+
+def is_greeting(text):
+    """Check if the input is a greeting."""
+    greetings = [
+        'hello', 'hi', 'hey', 'greetings', 'good morning', 'good afternoon', 
+        'good evening', 'howdy', 'what\'s up', 'whats up', 'hiya'
+    ]
+    
+    # Convert to lowercase and strip punctuation for comparison
+    text_lower = text.lower().strip().rstrip('!.,?')
+    
+    # Check if the input contains a greeting
+    for greeting in greetings:
+        if greeting in text_lower or text_lower in greeting:
+            return True
+            
+    # Check for greeting + docbot patterns
+    docbot_patterns = ['docbot', 'doc bot', 'bot', 'assistant']
+    for pattern in docbot_patterns:
+        for greeting in greetings:
+            combined = f"{greeting} {pattern}"
+            if combined in text_lower or text_lower in combined:
+                return True
+    
+    return False
+
+
+def get_greeting_response():
+    """Return a friendly greeting response."""
+    import random
+    responses = [
+        "Hello! I'm DocBot, your medical assistant. How can I help you today?",
+        "Hi there! I'm ready to help with your medical questions.",
+        "Greetings! I'm DocBot, here to provide medical information. What would you like to know?",
+        "Hello! How can I assist you with medical information today?",
+        "Hi! I'm your medical chatbot assistant. What medical questions do you have?"
+    ]
+    return random.choice(responses)
+
+
 def main():
-    st.title("Ask docBot!")
+    # Load and apply custom CSS
+    with open('style.css') as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+    
+    # Larger title with custom class
+    st.markdown('<h1 class="docbot-title">Ask docBot!</h1>', unsafe_allow_html=True)
 
     if 'messages' not in st.session_state:
         st.session_state.messages = []
@@ -42,51 +106,61 @@ def main():
     for message in st.session_state.messages:
         st.chat_message(message['role']).markdown(message['content'])
 
-    prompt=st.chat_input("Pass your prompt here")
+    prompt = st.chat_input("Pass your prompt here")
 
     if prompt:
         st.chat_message('user').markdown(prompt)
         st.session_state.messages.append({'role':'user', 'content': prompt})
 
-        CUSTOM_PROMPT_TEMPLATE = """
-                Use the pieces of information provided in the context to answer user's question.
-                If you dont know the answer, just say that you dont know, dont try to make up an answer. 
-                Dont provide anything out of the given context
+        # Check if the input is a greeting
+        if is_greeting(prompt):
+            # If it's a greeting, respond with a greeting
+            greeting_response = get_greeting_response()
+            st.chat_message('assistant').markdown(greeting_response)
+            st.session_state.messages.append({'role':'assistant', 'content': greeting_response})
+        else:
+            # If it's not a greeting, process as a medical query
+            CUSTOM_PROMPT_TEMPLATE = """
+                    Use the pieces of information provided in the context to answer user's question.
+                    If you dont know the answer, just say that you dont know, dont try to make up an answer. 
+                    Dont provide anything out of the given context
 
-                Context: {context}
-                Question: {question}
+                    Context: {context}
+                    Question: {question}
 
-                Start the answer directly. No small talk please.
-                """
-        
-        HUGGINGFACE_REPO_ID="mistralai/Mistral-7B-Instruct-v0.3"
-        HF_TOKEN=os.environ.get("HF_TOKEN")
+                    Start the answer directly. No small talk please.
+                    """
+            
+            HUGGINGFACE_REPO_ID="mistralai/Mistral-7B-Instruct-v0.3"
+            HF_TOKEN=os.environ.get("HF_TOKEN")
 
-        try: 
-            vectorstore=get_vectorstore()
-            if vectorstore is None:
-                st.error("Failed to load the vector store")
+            try: 
+                vectorstore=get_vectorstore()
+                if vectorstore is None:
+                    st.error("Failed to load the vector store")
 
-            qa_chain=RetrievalQA.from_chain_type(
-                llm=load_llm(huggingface_repo_id=HUGGINGFACE_REPO_ID, HF_TOKEN=HF_TOKEN),
-                chain_type="stuff",
-                retriever=vectorstore.as_retriever(search_kwargs={'k':3}),
-                return_source_documents=True,
-                chain_type_kwargs={'prompt':set_custom_prompt(CUSTOM_PROMPT_TEMPLATE)}
-            )
+                qa_chain=RetrievalQA.from_chain_type(
+                    llm=load_llm(huggingface_repo_id=HUGGINGFACE_REPO_ID, HF_TOKEN=HF_TOKEN),
+                    chain_type="stuff",
+                    retriever=vectorstore.as_retriever(search_kwargs={'k':3}),
+                    return_source_documents=True,
+                    chain_type_kwargs={'prompt':set_custom_prompt(CUSTOM_PROMPT_TEMPLATE)}
+                )
 
-            response=qa_chain.invoke({'query':prompt})
+                response=qa_chain.invoke({'query':prompt})
 
-            result=response["result"]
-            source_documents=response["source_documents"]
-            result_to_show=result+"\nSource Docs:\n"+str(source_documents)
+                result=response["result"]
+                # Format text for better display (if you have this function)
+                if 'format_text_for_display' in globals():
+                    formatted_result = format_text_for_display(result)
+                else:
+                    formatted_result = result
+                
+                st.chat_message('assistant').markdown(formatted_result)
+                st.session_state.messages.append({'role':'assistant', 'content': formatted_result})
 
-            #response="Hi, I am docBot!"
-            st.chat_message('assistant').markdown(result_to_show)
-            st.session_state.messages.append({'role':'assistant', 'content': result_to_show})
-
-        except Exception as e:
-            st.error(f"Error: {str(e)}")
+            except Exception as e:
+                st.error(f"Error: {str(e)}")
 
 if __name__ == "__main__":
     main()

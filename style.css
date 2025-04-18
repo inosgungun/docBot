@@ -1,0 +1,176 @@
+/* Override Streamlit's default background color */
+.stApp {
+    background-color: #04364A !important;
+}
+
+/* Main container styling */
+.main {
+    background-color: #04364A !important;
+}
+
+/* Block containers */
+.css-1d391kg, .css-12oz5g7 {
+    background-color: #04364A !important;
+}
+
+/* Sidebar containers */
+.css-1n76uvr {
+    background-color: #04364A !important;
+}
+
+/* Title styling */
+.stTitle {
+    color: #DAFFFB !important;
+}
+
+/* Title styling - bigger and white */
+h1.docbot-title {
+    color: #FFFFFF !important;
+    font-size: 50px !important;
+    text-align: center !important;
+    margin-bottom: 30px !important;
+    font-weight: bold !important;
+    text-shadow: 0 0 10px rgba(100, 204, 197, 0.5) !important;
+}
+
+/* Chat message styling */
+.stChatMessage {
+    background-color: #176B87;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+/* User message specific styling */
+.stChatMessage[data-testid="user-message"] {
+    background-color: #64CCC5 !important;
+    color: #04364A !important; 
+}
+
+/* User message text color */
+.stChatMessage[data-testid="user-message"] .stMarkdown {
+    color: #04364A !important;
+}
+
+/* Assistant message specific styling */
+.stChatMessage[data-testid="assistant-message"] {
+    background-color: #176B87 !important;
+}
+
+/* Fixing chat message content wrapping */
+.stChatMessage > div {
+    word-wrap: break-word !important;
+    white-space: pre-wrap !important;
+    overflow-wrap: break-word !important;
+    max-width: 100% !important;
+}
+
+/* Markdown content in chat messages */
+.stMarkdown {
+    color: #DAFFFB !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* Input box styling */
+.stTextInput > div > div > input {
+    border: 2px solid #64CCC5 !important;
+    color: #DAFFFB !important;
+    background-color: #176B87 !important;
+}
+
+/* Button styling */
+.stButton > button {
+    background-color: #64CCC5 !important;
+    color: #04364A !important;
+    border: none !important;
+}
+
+/* Button hover effect */
+.stButton > button:hover {
+    background-color: #DAFFFB !important;
+}
+
+/* Override any dark mode specific styling */
+[data-testid="stAppViewContainer"] {
+    background-color: #04364A !important;
+}
+
+[data-testid="stHeader"] {
+    background-color: #04364A !important;
+}
+
+[data-testid="stToolbar"] {
+    background-color: #04364A !important;
+}
+
+[data-testid="stDecoration"] {
+    background-color: #04364A !important;
+}
+
+/* Make sure the base page is also the right color */
+section[data-testid="stSidebar"] > div {
+    background-color: #04364A !important;
+}
+
+.st-emotion-cache-1y4p8pa {
+    background-color: #04364A !important;
+}
+
+.st-emotion-cache-1wrcr25 {
+    background-color: #04364A !important;
+}
+
+/* Fix for scrollbars and whitespace */
+pre {
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+    background-color: #176B87 !important;
+    color: #DAFFFB !important;
+}
+
+code {
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    background-color: #176B87 !important;
+    color: #DAFFFB !important;
+}
+
+.element-container {
+    width: 100% !important;
+}
+
+/* Chat input field */
+.stChatInput > div {
+    background-color: #176B87 !important;
+    border: 1px solid #64CCC5 !important;
+    border-radius: 8px !important;
+}
+
+/* Chat input container */
+.stChatInputContainer {
+    background-color: #451952 !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px !important;
+    background-color: #451952 !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #AE445A !important;
+    border-radius: 10px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #F39F5A !important;
+}
+
+/* Footer area - keep dark to match */
+footer {
+    background-color: #04364A !important;
+}
