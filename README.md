@@ -25,13 +25,12 @@
 1. **Install Pipenv** (if not already installed):
    ```bash
    pip install pipenv
-2. **Create a virtual environment and install dependencies:**
-   ```bash
-   pipenv install
-   pipenv install langchain langchain_community langchain_huggingface faiss-cpu pypdf streamlit
-3. **Activate the virtual environment:**
+2. **Create and activate a virtual environment:**
    ```bash
    pipenv shell
+3. **Install dependencies:**
+   ```bash
+   pipenv install langchain langchain_community langchain_huggingface faiss-cpu pypdf streamlit
 4. ****Generate a Hugging Face token** from [https://huggingface.co/](https://huggingface.co/), then create a `.env` file in your project root and add:**
    ```bash
    HF_TOKEN=your_huggingface_token
