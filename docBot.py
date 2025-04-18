@@ -36,10 +36,8 @@ def load_llm(huggingface_repo_id, HF_TOKEN):
 
 def format_text_for_display(text):
     """Format text to display properly in Streamlit with line breaks."""
-    # Replace single newlines with double newlines for better spacing
     text = text.replace('\n', '\n\n')
     
-    # Format numbered lists properly
     numbered_pattern = r'(\d+\.\s)'
     if re.search(numbered_pattern, text):
         parts = []
@@ -60,15 +58,12 @@ def is_greeting(text):
         'good evening', 'howdy', 'what\'s up', 'whats up', 'hiya'
     ]
     
-    # Convert to lowercase and strip punctuation for comparison
     text_lower = text.lower().strip().rstrip('!.,?')
     
-    # Check if the input contains a greeting
     for greeting in greetings:
         if greeting in text_lower or text_lower in greeting:
             return True
             
-    # Check for greeting + docbot patterns
     docbot_patterns = ['docbot', 'doc bot', 'bot', 'assistant']
     for pattern in docbot_patterns:
         for greeting in greetings:
@@ -93,11 +88,9 @@ def get_greeting_response():
 
 
 def main():
-    # Load and apply custom CSS
     with open('style.css') as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
     
-    # Larger title with custom class
     st.markdown('<h1 class="docbot-title">Ask docBot!</h1>', unsafe_allow_html=True)
 
     if 'messages' not in st.session_state:
@@ -112,14 +105,11 @@ def main():
         st.chat_message('user').markdown(prompt)
         st.session_state.messages.append({'role':'user', 'content': prompt})
 
-        # Check if the input is a greeting
         if is_greeting(prompt):
-            # If it's a greeting, respond with a greeting
             greeting_response = get_greeting_response()
             st.chat_message('assistant').markdown(greeting_response)
             st.session_state.messages.append({'role':'assistant', 'content': greeting_response})
         else:
-            # If it's not a greeting, process as a medical query
             CUSTOM_PROMPT_TEMPLATE = """
                     Use the pieces of information provided in the context to answer user's question.
                     If you dont know the answer, just say that you dont know, dont try to make up an answer. 
@@ -150,7 +140,6 @@ def main():
                 response=qa_chain.invoke({'query':prompt})
 
                 result=response["result"]
-                # Format text for better display (if you have this function)
                 if 'format_text_for_display' in globals():
                     formatted_result = format_text_for_display(result)
                 else:
